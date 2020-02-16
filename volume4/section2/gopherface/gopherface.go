@@ -56,6 +56,8 @@ func main() {
 	r.Handle("/myprofile", middleware.GatedContentHandler(handlers.MyProfileHandler(&env))).Methods("GET")
 	r.Handle("/profile/{username}", middleware.GatedContentHandler(handlers.ProfileHandler(&env))).Methods("GET")
 
+	r.HandleFunc("/uploadpdf", handlers.UploadImageHandler).Methods("GET", "POST")
+
 	// Register REST API Endpoints
 	r.Handle("/restapi/get-user-profile", middleware.GatedContentHandler(endpoints.GetUserProfileEndpoint(&env))).Methods("GET", "POST")
 	r.Handle("/restapi/save-user-profile", middleware.GatedContentHandler(endpoints.SaveUserProfileEndpoint(&env))).Methods("POST")
