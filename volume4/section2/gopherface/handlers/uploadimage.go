@@ -72,7 +72,7 @@ func ProcessUploadImage(w http.ResponseWriter, r *http.Request, u *UploadImageFo
 		m["imagePath"] = strings.TrimPrefix(imageFilePathWithoutExtension, ".") + ".png"
 		m["PageTitle"] = "Image Preview"
 
-		RenderGatedTemplate(w, WebAppRoot+"/templates/imagepreview.html", m)
+		RenderGatedTemplate(w, WebAppRoot+"/templates/pdfUploadConfirmation.html", m)
 
 	} else {
 		w.Write([]byte("Failed to process uploaded file!"))

@@ -56,8 +56,8 @@ func main() {
 	r.Handle("/myprofile", middleware.GatedContentHandler(handlers.MyProfileHandler(&env))).Methods("GET")
 	r.Handle("/profile/{username}", middleware.GatedContentHandler(handlers.ProfileHandler(&env))).Methods("GET")
 
-	r.HandleFunc("/uploadpdf", handlers.UploadImageHandler).Methods("GET", "POST")
-
+	//r.HandleFunc("/uploadpdf", handlers.UploadImageHandler).Methods("GET", "POST")
+	r.Handle("/uploadpdf", middleware.GatedContentHandler(handlers.UploadImageHandler)).Methods("GET", "POST")
 	// Register REST API Endpoints
 	r.Handle("/restapi/get-user-profile", middleware.GatedContentHandler(endpoints.GetUserProfileEndpoint(&env))).Methods("GET", "POST")
 	r.Handle("/restapi/save-user-profile", middleware.GatedContentHandler(endpoints.SaveUserProfileEndpoint(&env))).Methods("POST")
@@ -69,6 +69,8 @@ func main() {
 	r.Handle("/restapi/save-post", middleware.GatedContentHandler(endpoints.SavePostEndpoint(&env))).Methods("GET", "POST")
 	r.Handle("/restapi/fetch-posts", middleware.GatedContentHandler(endpoints.FetchPostsEndpoint(&env))).Methods("GET", "POST")
 	r.Handle("/restapi/get-gopher-profile", middleware.GatedContentHandler(endpoints.GetGopherProfileEndpoint(&env))).Methods("GET", "POST")
+
+	//r.HandleFunc("/restapi/uploadpdf", middleware.GatedContentHandler(endpoints.UploadImageHandler(&env))).Methods("GET", "POST")
 
 	r.Handle("/js/client.js", isokit.GopherjsScriptHandler(WebAppRoot))
 	r.Handle("/js/client.js.map", isokit.GopherjsScriptMapHandler(WebAppRoot))
