@@ -336,3 +336,32 @@ func (m *MySQLDatastore) FetchPosts(owner string) ([]socialmedia.Post, error) {
 	return posts, nil
 
 }
+
+func (m *MySQLDatastore) AddBill(owner string, originalfilename string, generatedfilename string) error {
+
+	tx, err := m.Begin()
+	if err != nil {
+		log.Print(err)
+	}
+
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare("INSERT INTO bills(uuid, originalfilename, generatedfilename) VALUES(?, ?, ?)")
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(owner, originalfilename, generatedfilename)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

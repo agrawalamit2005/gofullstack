@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common"
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common/asyncq"
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common/utility"
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/tasks"
@@ -24,7 +26,7 @@ func DisplayUploadImageForm(w http.ResponseWriter, r *http.Request, u *UploadIma
 	RenderGatedTemplate(w, WebAppRoot+"/templates/uploadimageform.html", u)
 }
 
-func ProcessUploadImage(w http.ResponseWriter, r *http.Request, u *UploadImageForm) {
+func ProcessUploadImage(w http.ResponseWriter, r *http.Request, u *UploadImageForm, e *common.Env) {
 
 	shouldProcessThumbnailAsynchronously := true
 
@@ -72,6 +74,14 @@ func ProcessUploadImage(w http.ResponseWriter, r *http.Request, u *UploadImageFo
 		m["imagePath"] = strings.TrimPrefix(imageFilePathWithoutExtension, ".") + ".png"
 		m["PageTitle"] = "Image Preview"
 
+		if e != nil {
+			fmt.Println("reached Adding bill %s generate %s", (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
+			e.DB.AddBill("1234", (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
+			e.DB.AddBill("123", "amitOriginal", "AmitGenerated")
+		} else {
+			fmt.Println("e is NUll")
+		}
+
 		RenderGatedTemplate(w, WebAppRoot+"/templates/pdfUploadConfirmation.html", m)
 
 	} else {
@@ -81,7 +91,13 @@ func ProcessUploadImage(w http.ResponseWriter, r *http.Request, u *UploadImageFo
 
 func ValidateUploadImageForm(w http.ResponseWriter, r *http.Request, u *UploadImageForm) {
 
-	ProcessUploadImage(w, r, u)
+	ProcessUploadImage(w, r, u, nil)
+
+}
+
+func ValidateUploadImageFormDB(w http.ResponseWriter, r *http.Request, u *UploadImageForm, e *common.Env) {
+
+	ProcessUploadImage(w, r, u, e)
 
 }
 
@@ -102,4 +118,25 @@ func UploadImageHandler(w http.ResponseWriter, r *http.Request) {
 		DisplayUploadImageForm(w, r, &u)
 	}
 
+}
+
+func UploadImageHandlerDB(w http.ResponseWriter, r *http.Request, e *common.Env) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		u := UploadImageForm{}
+		u.Fields = make(map[string]string)
+		u.Errors = make(map[string]string)
+		u.PageTitle = "Upload Image DB"
+
+		switch r.Method {
+
+		case "GET":
+			DisplayUploadImageForm(w, r, &u)
+		case "POST":
+			ValidateUploadImageFormDB(w, r, &u, e)
+		default:
+			DisplayUploadImageForm(w, r, &u)
+		}
+
+	})
 }

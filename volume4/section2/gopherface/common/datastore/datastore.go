@@ -20,6 +20,7 @@ type Datastore interface {
 	SavePost(owner string, title string, body string, mood int) error
 	FetchPosts(owner string) ([]socialmedia.Post, error)
 	GetGopherProfile(username string) (*models.UserProfile, error)
+	AddBill(uuid string, originalfilename string, generatedfilename string) error
 }
 
 const (

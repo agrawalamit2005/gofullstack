@@ -52,6 +52,11 @@ func (m *MongoDBDatastore) GetUser(username string) (*models.User, error) {
 
 }
 
+func (m *MongoDBDatastore) AddBill(uuid string, originalfilename string, generatedfilename string) error {
+
+	return nil
+}
+
 func (m *MongoDBDatastore) Close() {
 	m.Close()
 }

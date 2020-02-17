@@ -70,6 +70,11 @@ func (r *RedisDatastore) GetUser(username string) (*models.User, error) {
 	return &u, nil
 }
 
+func (r *RedisDatastore) AddBill(uuid string, originalfilename string, generatedfilename string) error {
+
+	return nil
+}
+
 func (r *RedisDatastore) Close() {
 
 	r.Close()
