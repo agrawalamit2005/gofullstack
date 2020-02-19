@@ -11,6 +11,7 @@ import (
 
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common"
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common/asyncq"
+	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common/authenticate"
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/common/utility"
 	"github.com/EngineerKamesh/gofullstack/volume4/section2/gopherface/tasks"
 )
@@ -75,11 +76,19 @@ func ProcessUploadImage(w http.ResponseWriter, r *http.Request, u *UploadImageFo
 		m["PageTitle"] = "Image Preview"
 
 		if e != nil {
-			fmt.Println("reached Adding bill %s generate %s", (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
-			e.DB.AddBill("1234", (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
-			e.DB.AddBill("123", "amitOriginal", "AmitGenerated")
+			//fmt.Println("reached Adding bill %s generate %s", (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
+			gfSession, err := authenticate.SessionStore.Get(r, "gopherface-session")
+			if err != nil {
+				log.Print(err)
+				return
+			}
+			uuid := gfSession.Values["uuid"].(string)
+			username := gfSession.Values["username"].(string)
+			log.Printf("log reached Adding bill for %s original name is %s generated is %s", username, (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
+			e.DB.AddBill(uuid, (fileheader.Filename), (imageFilePathWithoutExtension + extension))
 		} else {
 			fmt.Println("e is NUll")
+			log.Printf("log e is NUll")
 		}
 
 		RenderGatedTemplate(w, WebAppRoot+"/templates/pdfUploadConfirmation.html", m)
@@ -120,9 +129,10 @@ func UploadImageHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func UploadImageHandlerDB(w http.ResponseWriter, r *http.Request, e *common.Env) http.Handler {
+func UploadImageHandlerDB(e *common.Env) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
+		log.Printf("log reached UploadImageHandlerDB")
+		fmt.Println("reached UploadImageHandlerDB")
 		u := UploadImageForm{}
 		u.Fields = make(map[string]string)
 		u.Errors = make(map[string]string)

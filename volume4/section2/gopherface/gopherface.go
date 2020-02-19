@@ -28,7 +28,7 @@ var WebAppRoot = os.Getenv("GOPHERFACE_APP_ROOT")
 func main() {
 
 	db, err := datastore.NewDatastore(datastore.MYSQL, "gopherface:gopherface@/gopherfacedb")
-
+	//db, err := datastore.NewDatastore(datastore.MYSQL, "gopherface:gopherface@tcp(10.21.11.149:3306)/gopherfacedb")
 	if err != nil {
 		log.Print(err)
 	}
@@ -57,7 +57,7 @@ func main() {
 	r.Handle("/profile/{username}", middleware.GatedContentHandler(handlers.ProfileHandler(&env))).Methods("GET")
 
 	//r.HandleFunc("/uploadpdf", handlers.UploadImageHandler).Methods("GET", "POST")
-	r.Handle("/uploadpdf", middleware.GatedContentHandler(handlers.UploadImageHandler)).Methods("GET", "POST")
+	r.Handle("/uploadpdf", middleware.GatedContentHandler(handlers.UploadImageHandlerDB(&env))).Methods("GET", "POST")
 	// Register REST API Endpoints
 	r.Handle("/restapi/get-user-profile", middleware.GatedContentHandler(endpoints.GetUserProfileEndpoint(&env))).Methods("GET", "POST")
 	r.Handle("/restapi/save-user-profile", middleware.GatedContentHandler(endpoints.SaveUserProfileEndpoint(&env))).Methods("POST")
@@ -84,6 +84,7 @@ func main() {
 
 	//	err = http.ListenAndServeTLS(WEBSERVERPORT, WebAppRoot+"/certs/gopherfacecert.pem", WebAppRoot+"/certs/gopherfacekey.pem", nil)
 	//	http.Handle("/", r)
+	log.Printf("started Gopherface service")
 	err = http.ListenAndServe(WEBSERVERPORT, nil)
 
 	if err != nil {

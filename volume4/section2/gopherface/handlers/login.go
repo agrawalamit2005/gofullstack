@@ -75,6 +75,7 @@ func ProcessLoginForm(w http.ResponseWriter, r *http.Request, l *LoginForm, e *c
 	if authResult == true {
 
 		sessionID := utility.GenerateUUID()
+		//sessionID := utility.GenerateUUIDwindows()
 		fmt.Println("sessid: ", sessionID)
 		u, err := e.DB.GetUser(r.FormValue("username"))
 		if err != nil {
