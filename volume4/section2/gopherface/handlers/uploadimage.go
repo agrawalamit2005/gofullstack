@@ -120,12 +120,29 @@ func ValidateUploadImageFormDB(w http.ResponseWriter, r *http.Request, u *Upload
 	ProcessUploadImage(w, r, u, e)
 
 }
-func GetPdfHandler(w http.ResponseWriter, r *http.Request) {
-
-	bill := BillItem{UUID: "123", BillDate: "today", BillAmount: 12, UserName: "amit", BillFileName: "abc.pdf", Caption: "BillCaption"}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(bill)
-
+func GetPdfHandler(e *common.Env) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var uuid string = ""
+		var username string = ""
+		if e != nil {
+			//fmt.Println("reached Adding bill %s generate %s", (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
+			gfSession, err := authenticate.SessionStore.Get(r, "gopherface-session")
+			if err != nil {
+				log.Print(err)
+				return
+			}
+			uuid = gfSession.Values["uuid"].(string)
+			username = gfSession.Values["username"].(string)
+			//log.Printf("log reached Adding bill for %s original name is %s generated is %s", username, (fileheader.Filename + extension), (imageFilePathWithoutExtension + extension))
+			//e.DB.AddBill(uuid, (fileheader.Filename), (imageFilePathWithoutExtension + extension))
+		} else {
+			fmt.Println("e is NUll")
+			log.Printf("log e is NUll")
+		}
+		bill := BillItem{UUID: uuid, BillDate: "today", BillAmount: 12, UserName: username, BillFileName: "abc.pdf", Caption: "BillCaption"}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(bill)
+	})
 }
 
 func UploadImageHandler(w http.ResponseWriter, r *http.Request) {
