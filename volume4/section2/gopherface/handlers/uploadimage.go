@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -21,6 +22,16 @@ type UploadImageForm struct {
 	FieldNames []string
 	Fields     map[string]string
 	Errors     map[string]string
+}
+
+type BillItem struct {
+	//AuditableContent        // Embedded type
+	UUID         string `json:"uuid"`
+	BillDate     string `json:"billdate"`
+	BillAmount   int    `json:"billamount"`
+	UserName     string `json:"username"`
+	BillFileName string `json: "billfilename"`
+	Caption      string `json:"caption"`
 }
 
 func DisplayUploadImageForm(w http.ResponseWriter, r *http.Request, u *UploadImageForm) {
@@ -107,6 +118,13 @@ func ValidateUploadImageForm(w http.ResponseWriter, r *http.Request, u *UploadIm
 func ValidateUploadImageFormDB(w http.ResponseWriter, r *http.Request, u *UploadImageForm, e *common.Env) {
 
 	ProcessUploadImage(w, r, u, e)
+
+}
+func GetPdfHandler(w http.ResponseWriter, r *http.Request) {
+
+	bill := BillItem{UUID: "123", BillDate: "today", BillAmount: 12, UserName: "amit", BillFileName: "abc.pdf", Caption: "BillCaption"}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(bill)
 
 }
 
